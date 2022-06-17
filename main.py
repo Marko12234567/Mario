@@ -96,9 +96,9 @@ class Player1(GameSprite):
         global step
         for tile in world.tile_list:
             if tile[1].colliderect(self.rect.x, self.rect.y, self.size_x, self.size_y):
-                if self.vel_y < 0:
-                    self.rect.y -= tile[1].bottom - self.rect.top
-                    self.vel_y = 0
+                #if self.vel_y < 0:
+                    #self.rect.y -= tile[1].bottom - self.rect.top
+                    #self.vel_y = 0
                 if self.vel_y >= 0:
                     self.rect.y += tile[1].top - self.rect.bottom
                     self.vel_y = 0
@@ -331,10 +331,11 @@ game = True
 gravity = 5
 zero_point = 0
 spavn_points = [500, 550, 1000, 1500, 2000, 2500, 2600, 2680, 3200, 5000, 4000, 3500, 6850, 7000, 7200, 7500, 7700, 8000]
-print(world.tile_list)
+pygame.font.init()
+font1 = pygame.font.SysFont("Arial", 215)
+text = font1.render("YOU WIN",1, (212,241,0))
+text2 = font1.render("GAME OVER",1, (250,0,0))
 while game:
-    '''for tile in tile_list:
-        print(type(tile[1]))'''
     window.blit(bg, (i, 0))
     window.blit(bg, (i+width, 0))
     window.blit(bg, (i-width, 0))
@@ -344,8 +345,6 @@ while game:
     if i == width:
         window.blit(bg, (i, 0))
         i = 0
-        
-
     for e in pygame.event.get():
         if e.type == pygame.QUIT:
             game = False
@@ -372,16 +371,36 @@ while game:
         move_right = False
         move_left = False
         stepIndex = 0
-    print(zero_point)
     for x_coor in spavn_points:
         if zero_point - 2 <= x_coor and zero_point + 2 >= x_coor:
-            gumba_a = Enemy(gumba_left[0], 2, win_width - 100, 300, 65, 65)
+            gumba_a = Enemy(gumba_left[0], 2, win_width + 100, 300, 65, 65)
             enemies.add(gumba_a)
 
     for enemy in enemies:
-        if pygame.sprite.collide_resct(player1, enemy):
-            if player.rect.bottom - enemy.rect.top <= 50:
+        if pygame.sprite.collide_rect(player1, enemy):
+            if player1.rect.bottom - enemy.rect.top <= 50:
                 enemies.remove(enemy)
+            if player1.rect.left - enemy.rect.right <= 50 or player1.rect.right - enemy.rect.left <= 50:
+                player1.kill()
+                window.fill((0, 0, 0), (0, 0, win_width, win_height))
+                window.blit(text2, (250, 250))
+                pygame.display.update()
+                pygame.time.delay(5000)
+                game = False
+            
+ 
+
+    for tile in world.tile_list:
+        if tile[1].colliderect(player1):
+            if abs(player1.rect.top - tile[1].bottom) <= 20:
+                world.tile_list.remove(tile)
+            if zero_point >= 12950:
+                if abs(player1.rect.right - tile[1].left) <= 20:
+                    window.fill((0, 0, 0), (0, 0, win_width, win_height))
+                    window.blit(text, (250, 250))
+                    pygame.display.update()
+                    pygame.time.delay(5000)
+                    game = False
 
             
 
